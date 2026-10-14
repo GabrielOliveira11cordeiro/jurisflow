@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import sequelize from './config/database.js'
 import perfilRoutes from './routes/perfilRoutes.js'
 import usuarioRoutes from './routes/usuarioRoutes.js'
@@ -14,9 +15,15 @@ import perfilPermissaoRoutes from './routes/perfilPermissaoRoutes.js'
 import pastaResponsavelRoutes from './routes/pastaResponsavelRoutes.js'
 import casoResponsavelRoutes from './routes/casoResponsavelRoutes.js'
 import diligenciaResponsavelRoutes from './routes/diligenciaResponsavelRoutes.js'
+import atualizacaoProcessoRoutes from './routes/atualizacaoprocessoRoutes.js'
+import clienteHistoricoContatoRoutes from './routes/clientehistoricocontatoRoutes.js'
+import historicoAtividadeRoutes from './routes/historicoatividadeRoutes.js'
+
 const app = express()
 
+app.use(cors())
 app.use(express.json())
+
 app.use('/perfil', perfilRoutes)
 app.use('/usuario', usuarioRoutes)
 app.use('/permissao', permissaoRoutes)
@@ -31,8 +38,9 @@ app.use('/perfil-permissao', perfilPermissaoRoutes)
 app.use('/pasta-responsavel', pastaResponsavelRoutes)
 app.use('/caso-responsavel', casoResponsavelRoutes)
 app.use('/diligencia-responsavel', diligenciaResponsavelRoutes)
-
-
+app.use('/atualizacao-processo', atualizacaoProcessoRoutes)
+app.use('/cliente-historico-contato', clienteHistoricoContatoRoutes)
+app.use('/historico-atividade', historicoAtividadeRoutes)
 sequelize.authenticate().then(() => {
   console.log("banco de dados Conetado")
 
