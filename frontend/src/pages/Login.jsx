@@ -19,10 +19,10 @@ export default function Login() {
         login: 'milena.admin',
         email: 'milena.admin@jurisflow.com',
         status: true,
-        perfil_id: 99
+        perfil_id: 3
       };
       localStorage.setItem('@JurisFlow:usuario', JSON.stringify(usuarioMock));
-      localStorage.setItem('@JurisFlow:perfil_id', '99'); 
+      localStorage.setItem('@JurisFlow:perfil_id', '3'); 
       navigate('/dashboard');
       return; 
     }
@@ -52,7 +52,7 @@ export default function Login() {
       console.log("Back-end off-line ou rota /login não criada. Usando validação simulada para o TCC.");
       
       if (login === 'admin' && senha === '123') {
-        localStorage.setItem('@JurisFlow:perfil_id', '99'); 
+        localStorage.setItem('@JurisFlow:perfil_id', '3'); 
         navigate('/dashboard');
       } else if (login === 'milena123' && senha === 'senha123') { 
         localStorage.setItem('@JurisFlow:perfil_id', '1'); 

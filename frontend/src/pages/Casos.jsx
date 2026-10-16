@@ -4,7 +4,7 @@ import Layout from '../components/Layout'
 export default function Casos() {
   const navigate = useNavigate() 
   const perfilId = localStorage.getItem('@JurisFlow:perfil_id');
-  const podeInteragirComCaso = perfilId === '99' || perfilId === '1' || perfilId === '2';
+  const podeInteragirComCaso = perfilId === '3' || perfilId === '1' || perfilId === '2';
 
   const casosFake = [
     { id: 1, titulo: 'Ação Previdenciária - Antônio Silva', fase: 'inicial', status: 'ativo', pasta_id: 101, responsavel_principal: 'Dr. Gabriel Cordeiro', tem_processo: true },

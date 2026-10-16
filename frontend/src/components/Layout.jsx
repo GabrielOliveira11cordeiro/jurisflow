@@ -19,12 +19,13 @@ export default function Layout({ children }) {
 
   // Lista de links de navegação da plataforma com controle de acesso por ID
   const menuItems = [
-    { text: 'Painel Principal', path: '/dashboard', icon: '📊', perfisPermitidos: ['99', '1', '2'] },
-    { text: 'Clientes', path: '/clientes', icon: '👤', perfisPermitidos: ['99', '1', '2'] }, // 🌟 Movido para cima de Casos
-    { text: 'Casos', path: '/casos', icon: '⚖️', perfisPermitidos: ['99', '1', '2'] }, 
-    { text: 'Histórico Geral', path: '/historico', icon: '⏳', perfisPermitidos: ['99', '1', '2'] },
-    { text: 'Cadastrar Equipe', path: '/usuarios/novo', icon: '➕', perfisPermitidos: ['99']} // 🔒 Só aparece se for o Admin logado!
-  ]
+  { text: 'Painel Principal', path: '/dashboard', icon: '📊', perfisPermitidos: ['3', '1', '2'] },
+  { text: 'Clientes', path: '/clientes', icon: '👤', perfisPermitidos: ['3', '1', '2'] }, 
+  { text: 'Casos', path: '/casos', icon: '⚖️', perfisPermitidos: ['3', '1', '2'] }, 
+  { text: 'Histórico Geral', path: '/historico', icon: '⏳', perfisPermitidos: ['3', '1', '2'] },
+  { text: 'Cadastrar Equipe', path: '/usuarios/novo', icon: '➕', perfisPermitidos: ['3']} // 🌟 Troque '99' por '3'
+]
+
 
   // Filtra os botões do menu com base nas permissões da US03
   const itensFiltrados = menuItems.filter(item => item.perfisPermitidos.includes(perfilId))
