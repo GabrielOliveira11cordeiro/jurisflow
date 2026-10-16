@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
-import Dashboard from './pages/Dashboard' // 🟢 Mantido o seu arquivo original aqui!
+import Dashboard from './pages/Dashboard' 
 import Casos from './pages/Casos' 
 import Clientes from './pages/Clientes'
 import NovoCliente from './pages/NovoCliente'
@@ -25,61 +25,63 @@ function App() {
 
         {/* 🔒 Rotas Protegidas (Sem o <Layout> aqui, pois você já importa dentro delas) */}
         
-        {/* Dashboard -> Seu componente original e protegido */}
+        {/* Dashboard -> 🌟 Incluído o '3' */}
         <Route path="/dashboard" element={
-          <PermissaoGuard perfisPermitidos={['99', '1', '2']}>
+          <PermissaoGuard perfisPermitidos={['3', '99', '1', '2']}>
             <Dashboard />
           </PermissaoGuard>
         } />
 
-        {/* Casos -> Admin, Advogado e Estagiário */}
+        {/* Casos -> 🌟 Incluído o '3' */}
         <Route path="/casos" element={
-          <PermissaoGuard perfisPermitidos={['99', '1', '2']}>
+          <PermissaoGuard perfisPermitidos={['3', '99', '1', '2']}>
             <Casos />
           </PermissaoGuard>
         } />
         
         <Route path="/casos/novo" element={
-          <PermissaoGuard perfisPermitidos={['99', '1', '2']}>
+          <PermissaoGuard perfisPermitidos={['3', '99', '1', '2']}>
             <NovoCaso />
           </PermissaoGuard>
         } />
         
         <Route path="/casos/processo/:id" element={
-          <PermissaoGuard perfisPermitidos={['99', '1', '2']}>
+          <PermissaoGuard perfisPermitidos={['3', '99', '1', '2']}>
             <AndamentoProcesso />
           </PermissaoGuard>
         } />
         
         <Route path="/diligencias/nova" element={
-          <PermissaoGuard perfisPermitidos={['99', '1', '2']}>
+          <PermissaoGuard perfisPermitidos={['3', '99', '1', '2']}>
             <NovaDiligencia />
           </PermissaoGuard>
         } />
 
-        {/* Clientes -> Todos acessam a listagem para consultar (US06) */}
+        {/* Clientes -> 🌟 Incluído o '3' */}
         <Route path="/clientes" element={
-          <PermissaoGuard perfisPermitidos={['99', '1', '2']}>
+          <PermissaoGuard perfisPermitidos={['3', '99', '1', '2']}>
             <Clientes />
           </PermissaoGuard>
         } />
 
-        {/* TRAVA: O Estagiário NÃO acesse a tela de cadastro (US05) */}
+        {/* TRAVA DE CADASTRO: 🌟 Incluído o '3' (Estagiário ID 2 continua bloqueado) */}
         <Route path="/clientes/novo" element={
-          <PermissaoGuard perfisPermitidos={['99', '1']}>
+          <PermissaoGuard perfisPermitidos={['3', '99', '1']}>
             <NovoCliente />
           </PermissaoGuard>
         } />
         
-        {/* ⏳ Histórico Geral -> Mantido e protegido com sucesso */}
+        {/* ⏳ Histórico Geral -> 🌟 Incluído o '3' */}
         <Route path="/historico" element={
-          <PermissaoGuard perfisPermitidos={['99', '1', '2']}>
+          <PermissaoGuard perfisPermitidos={['3', '99', '1', '2']}>
             <Historico />
           </PermissaoGuard>
         } />
+        
+        {/* 🔒 TRAVA DE ADMIN: 🌟 Apenas o '3' e '99' entram para cadastrar equipe */}
         <Route path="/usuarios/novo" element={
-          <PermissaoGuard perfisPermitidos={['99']}> {/* 🔒 TRAVA DE ADMIN: Só o '99' entra */}
-          <NovoUsuario />
+          <PermissaoGuard perfisPermitidos={['3', '99']}> 
+            <NovoUsuario />
           </PermissaoGuard>
         } />
 

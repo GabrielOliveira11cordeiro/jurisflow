@@ -12,27 +12,14 @@ export default function Login() {
     e.preventDefault();
     setErro('');
 
-    // 🌟 BLOCO INJETADO:
-    if (login === 'milena.admin' && senha === '123') {
-      const usuarioMock = {
-        nome: 'Dra. Milena Romano',
-        login: 'milena.admin',
-        email: 'milena.admin@jurisflow.com',
-        status: true,
-        perfil_id: 3
-      };
-      localStorage.setItem('@JurisFlow:usuario', JSON.stringify(usuarioMock));
-      localStorage.setItem('@JurisFlow:perfil_id', '3'); 
-      navigate('/dashboard');
-      return; 
-    }
-
     try {
+      // 🌟 REQUISIÇÃO REAL PRIMEIRO: Tenta autenticar direto no banco do Cazé
       const response = await api.post('/login', {
         login: login,
         senha: senha
       });
 
+      // Se a rota do Cazé existir e validar o usuário no banco, entra por aqui
       if (response.data && response.data.perfil_id) {
         const usuario = response.data;
 
@@ -41,17 +28,31 @@ export default function Login() {
           return;
         }
 
+        // Salva as credenciais REAIS vindas do PostgreSQL
         localStorage.setItem('@JurisFlow:usuario', JSON.stringify(usuario));
         localStorage.setItem('@JurisFlow:perfil_id', String(usuario.perfil_id)); 
 
         navigate('/dashboard');
+        return; // Encerra a execução pois o login real deu certo
       } else {
         setErro('Credenciais incorretas informadas pelo servidor.');
       }
     } catch (err) {
       console.log("Back-end off-line ou rota /login não criada. Usando validação simulada para o TCC.");
       
-      if (login === 'admin' && senha === '123') {
+      // 🔄 CONTINGÊNCIA: Só entra aqui se a requisição real falhar (Ex: erro 404)
+      if (login === 'milena.admin' && senha === '123') {
+        const usuarioMock = {
+          nome: 'Dra. Milena Romano',
+          login: 'milena.admin',
+          email: 'milena.admin@jurisflow.com',
+          status: true,
+          perfil_id: 3
+        };
+        localStorage.setItem('@JurisFlow:usuario', JSON.stringify(usuarioMock));
+        localStorage.setItem('@JurisFlow:perfil_id', '3'); 
+        navigate('/dashboard');
+      } else if (login === 'admin' && senha === '123') {
         localStorage.setItem('@JurisFlow:perfil_id', '3'); 
         navigate('/dashboard');
       } else if (login === 'milena123' && senha === 'senha123') { 
