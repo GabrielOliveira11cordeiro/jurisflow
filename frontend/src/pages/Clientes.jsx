@@ -7,8 +7,9 @@ export default function Clientes() {
   // 🌟 Pegamos o ID do perfil logado
   const perfilId = localStorage.getItem('@JurisFlow:perfil_id')
 
-  // Regra do TCC: Estagiário (ID '2') e Secretário (ID '3') não cadastram ou alteram clientes
-  const podeCadastrarEAlterar = perfilId === '99' || perfilId === '1'; // '99' = Admin, '1' = Advogado
+  // 👑 Regra do TCC Corrigida: Administrador-Chefe (ID '3') e Advogado (ID '1') podem interagir.
+  // Estagiário (ID '2') não cadastra ou altera clientes.
+  const podeCadastrarEAlterar = perfilId === '3' || perfilId === '1'; 
   
   const clientesFake = [
     { 
@@ -94,17 +95,17 @@ export default function Clientes() {
                       {cliente.status === true ? 'Ativo' : 'Inativo'}
                     </span>
                   </td>
-                   <td className="p-4 text-center space-x-2">
-          {podeCadastrarEAlterar ? (
-            <>
-              <button className="text-amber-600 hover:text-amber-700 font-semibold text-xs transition-colors cursor-pointer">Editar</button>
-              <span className="text-slate-300">|</span>
-              <button className="text-red-600 hover:text-red-700 font-semibold text-xs transition-colors cursor-pointer">Desativar</button>
-            </>
-          ) : (
-            <span className="text-slate-400 italic text-xs">Sem permissão</span>
-          )}
-        </td>
+                  <td className="p-4 text-center space-x-2">
+                    {podeCadastrarEAlterar ? (
+                      <>
+                        <button className="text-amber-600 hover:text-amber-700 font-semibold text-xs transition-colors cursor-pointer">Editar</button>
+                        <span className="text-slate-300">|</span>
+                        <button className="text-red-600 hover:text-red-700 font-semibold text-xs transition-colors cursor-pointer">Desativar</button>
+                      </>
+                    ) : (
+                      <span className="text-slate-400 italic text-xs">Sem permissão</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
