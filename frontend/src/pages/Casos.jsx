@@ -41,7 +41,7 @@ export default function Casos() {
                 <th className="p-4">Título do Caso</th>
                 <th className="p-4">Pasta ID</th>
                 <th className="p-4">Responsável Principal</th>
-                <th className="p-4">Fase Processual</th>
+                <th className="p-4 whitespace-nowrap">Fase Processual</th>
                 <th className="p-4 text-center">Status</th>
                 <th className="p-4 text-center">Ações</th>
               </tr>
@@ -52,11 +52,13 @@ export default function Casos() {
                   <td className="p-4 font-medium text-juris-blue">{caso.titulo}</td>
                   <td className="p-4 text-slate-500 font-mono">#{caso.pasta_id}</td>
                   <td className="p-4 text-slate-600">{caso.responsavel_principal}</td>
-                  <td className="p-4">
-                    <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-200">
+                  
+                  <td className="p-4 whitespace-nowrap">
+                    <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-[11px] font-medium border border-slate-200 block w-max">
                       {traduzirFase(caso.fase)}
                     </span>
                   </td>
+                  
                   <td className="p-4 text-center">
                     <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold uppercase ${
                       caso.status === 'ativo' ? 'bg-emerald-50 text-emerald-600' :
@@ -65,27 +67,34 @@ export default function Casos() {
                       {caso.status}
                     </span>
                   </td>
+                  
+                  {/* Coluna de Ações sem o botão de Evoluir */}
                   <td className="p-4 text-center flex items-center justify-center space-x-2">
-                    <button disabled={!podeInteragirComCaso} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs ${podeInteragirComCaso ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 cursor-pointer border border-amber-200' : 'bg-slate-50 text-slate-300 cursor-not-allowed border border-slate-100'}`}>
-                      ⚙️ Evoluir
-                    </button>
-                    
-                    <button disabled={!podeInteragirComCaso} onClick={() => navigate('/diligencias/nova')} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs ${podeInteragirComCaso ? 'bg-sky-50 text-sky-700 hover:bg-sky-100 cursor-pointer border border-sky-200' : 'bg-slate-50 text-slate-300 cursor-not-allowed border border-slate-100'}`}>
+                    <button 
+                      disabled={!podeInteragirComCaso} 
+                      onClick={() => navigate('/diligencias/nova')} 
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs ${
+                        podeInteragirComCaso 
+                          ? 'bg-sky-50 text-sky-700 hover:bg-sky-100 cursor-pointer border border-sky-200' 
+                          : 'bg-slate-50 text-slate-300 cursor-not-allowed border border-slate-100'
+                      }`}
+                    >
                       📅 + Diligência
                     </button>
                     
                     <span className="text-slate-300">|</span>
 
-                    {/* 🌟 BOTÃO REDIRECIONANDO PARA A TELA DE CAIXA DE TEXTO */}
                     {caso.tem_processo ? (
                       <button 
                         onClick={() => navigate(`/casos/processo/${caso.id}`)}
-                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition-all cursor-pointer shadow-xs border border-slate-800"
+                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-lg transition-all cursor-pointer shadow-xs border border-slate-800 whitespace-nowrap"
                       >
                         📁 Detalhes do Processo
                       </button>
                     ) : (
-                      <span className="text-slate-400 italic text-xs bg-slate-50 px-2 py-1.5 rounded-lg border border-slate-100">Sem Processo</span>
+                      <span className="text-slate-400 italic text-xs bg-slate-50 px-2 py-1.5 rounded-lg border border-slate-100 whitespace-nowrap">
+                        Sem Processo
+                      </span>
                     )}
                   </td>
                 </tr>
