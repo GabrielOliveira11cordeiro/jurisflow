@@ -1,14 +1,43 @@
+import { useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
 
 export default function Clientes() {
-  // Dados fictícios apenas para deixar o visual pronto antes do back-end
+  const navigate = useNavigate()
+  
+  // 🌟 Pegamos o ID do perfil logado
+  const perfilId = localStorage.getItem('@JurisFlow:perfil_id')
+
+  // Regra do TCC: Estagiário (ID '2') e Secretário (ID '3') não cadastram ou alteram clientes
+  const podeCadastrarEAlterar = perfilId === '99' || perfilId === '1'; // '99' = Admin, '1' = Advogado
+  
   const clientesFake = [
-    { id: 1, nome: 'Antônio Silva de Almeida', documento: '123.456.789-00', email: 'antonio@email.com', status: 'Ativo' },
-    { id: 2, nome: 'Maria Eduarda Rodrigues', documento: '987.654.321-11', email: 'maria.eduarda@email.com', status: 'Ativo' },
-    { id: 3, nome: 'Advocacia Ramos & Associados', documento: '12.345.678/0001-99', email: 'contato@ramosadv.com', status: 'Inativo' },
+    { 
+      id: 1, 
+      nome: 'Antônio Silva de Almeida', 
+      tipo_pessoa: 'fisica',
+      cpf: '123.456.789-00',
+      cnpj: null,
+      status: true // true no Sequelize mapeia para Ativo
+    },
+    { 
+      id: 2, 
+      nome: 'Maria Eduarda Rodrigues', 
+      tipo_pessoa: 'fisica',
+      cpf: '987.654.321-11', 
+      cnpj: null,
+      status: true
+    },
+    { 
+      id: 3, 
+      nome: 'Construções Ramos LTDA', 
+      tipo_pessoa: 'juridica',
+      cpf: null,
+      cnpj: '12.345.678/0001-99', 
+      status: false // false mapeia para Inativo
+    },
   ]
 
-  return (
+   return (
     <Layout>
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
         
@@ -16,13 +45,18 @@ export default function Clientes() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-extrabold text-juris-blue mb-1">Gestão de Clientes</h1>
-            <p className="text-slate-500 text-sm">Cadastro e histórico de contatos integrados ao `clienteController`.</p>
+            <p className="text-slate-500 text-sm">Listagem sincronizada com o modelo `Cliente.js` do Sequelize.</p>
           </div>
           
-          {/* Botão Novo Cliente */}
-          <button className="bg-juris-blue hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors cursor-pointer shadow-sm">
-            + Cadastrar Cliente
-          </button>
+          {/* 🌟 O botão só renderiza na tela se o usuário for Admin ou Advogado */}
+          {podeCadastrarEAlterar && (
+            <button 
+              onClick={() => navigate('/clientes/novo')}
+              className="bg-juris-blue hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors cursor-pointer shadow-sm"
+            >
+              + Cadastrar Cliente
+            </button>
+          )}
         </div>
 
         {/* 📊 Tabela de Clientes */}
@@ -31,26 +65,46 @@ export default function Clientes() {
             <thead>
               <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100">
                 <th className="p-4">Nome / Razão Social</th>
+                <th className="p-4">Tipo</th>
                 <th className="p-4">CPF / CNPJ</th>
-                <th className="p-4">E-mail</th>
                 <th className="p-4 text-center">Status</th>
+                <th className="p-4 text-center">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
               {clientesFake.map((cliente) => (
                 <tr key={cliente.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="p-4 font-medium text-juris-blue">{cliente.nome}</td>
-                  <td className="p-4 text-slate-500">{cliente.documento}</td>
-                  <td className="p-4 text-slate-500">{cliente.email}</td>
+                  <td className="p-4">
+                    <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${
+                      cliente.tipo_pessoa === 'fisica' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
+                    }`}>
+                      {cliente.tipo_pessoa}
+                    </span>
+                  </td>
+                  <td className="p-4 text-slate-500 font-mono">
+                    {cliente.tipo_pessoa === 'fisica' ? cliente.cpf : cliente.cnpj}
+                  </td>
                   <td className="p-4 text-center">
                     <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${
-                      cliente.status === 'Ativo' 
+                      cliente.status === true 
                         ? 'bg-emerald-50 text-emerald-600' 
                         : 'bg-slate-100 text-slate-500'
                     }`}>
-                      {cliente.status}
+                      {cliente.status === true ? 'Ativo' : 'Inativo'}
                     </span>
                   </td>
+                   <td className="p-4 text-center space-x-2">
+          {podeCadastrarEAlterar ? (
+            <>
+              <button className="text-amber-600 hover:text-amber-700 font-semibold text-xs transition-colors cursor-pointer">Editar</button>
+              <span className="text-slate-300">|</span>
+              <button className="text-red-600 hover:text-red-700 font-semibold text-xs transition-colors cursor-pointer">Desativar</button>
+            </>
+          ) : (
+            <span className="text-slate-400 italic text-xs">Sem permissão</span>
+          )}
+        </td>
                 </tr>
               ))}
             </tbody>
