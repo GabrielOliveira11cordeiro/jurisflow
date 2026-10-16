@@ -8,11 +8,11 @@ export default function Login() {
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
 
-    const handleLogin = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setErro('');
 
-    // 🌟 INJECTE ESSE BLOCO EXATAMENTE AQUI:
+    // 🌟 BLOCO INJETADO:
     if (login === 'milena.admin' && senha === '123') {
       const usuarioMock = {
         nome: 'Dra. Milena Romano',
@@ -22,52 +22,43 @@ export default function Login() {
         perfil_id: 99
       };
       localStorage.setItem('@JurisFlow:usuario', JSON.stringify(usuarioMock));
-      localStorage.setItem('@JurisFlow:perfil_id', '99'); // Libera o acesso total de Admin mestre
+      localStorage.setItem('@JurisFlow:perfil_id', '99'); 
       navigate('/dashboard');
-      return; // Interrompe a execução aqui para não bater na API que daria erro
+      return; 
     }
 
     try {
-      // Como o print do Cazé usa a rota '/usuario', simulamos a rota de login padrão do back-end
       const response = await api.post('/login', {
         login: login,
         senha: senha
       });
 
-      // 🔥 CORREÇÃO AQUI: Garante que a API respondeu sucesso E retornou um perfil_id válido
       if (response.data && response.data.perfil_id) {
         const usuario = response.data;
 
-        // Regra do TCC: Usuários inativos não poderão acessar o sistema
         if (usuario.status === false || usuario.status === 'inativo') {
           setErro('Usuário inativo. Acesso negado.');
           return;
         }
 
-        // Salva os dados do usuário e do perfil no navegador para controlar os acessos nas outras telas
         localStorage.setItem('@JurisFlow:usuario', JSON.stringify(usuario));
-        localStorage.setItem('@JurisFlow:perfil_id', String(usuario.perfil_id)); // Força virar string para bater com o Layout
+        localStorage.setItem('@JurisFlow:perfil_id', String(usuario.perfil_id)); 
 
-        // Direciona o usuário conforme suas permissões (Módulo 01 - US01)
         navigate('/dashboard');
       } else {
-        // Se a API responder mas os dados estiverem vazios/incorretos
         setErro('Credenciais incorretas informadas pelo servidor.');
       }
     } catch (err) {
-      // ... Seu bloco catch atual com os logins simulados (admin, gabriel123, estagiario) fica EXATAMENTE IGUAL ...
-
-      // Enquanto o Cazé não cria a rota exata de autenticação, criamos um mock local para você testar os perfis
       console.log("Back-end off-line ou rota /login não criada. Usando validação simulada para o TCC.");
       
       if (login === 'admin' && senha === '123') {
-        localStorage.setItem('@JurisFlow:perfil_id', '99'); // ID fictício para Admin Chefe
+        localStorage.setItem('@JurisFlow:perfil_id', '99'); 
         navigate('/dashboard');
-      } else if (login === 'milena123' && senha === 'senha123') { // Dados idênticos ao print do Cazé
-        localStorage.setItem('@JurisFlow:perfil_id', '1'); // ID 1: Advogado
+      } else if (login === 'milena123' && senha === 'senha123') { 
+        localStorage.setItem('@JurisFlow:perfil_id', '1'); 
         navigate('/dashboard');
       } else if (login === 'estagiario' && senha === '123') {
-        localStorage.setItem('@JurisFlow:perfil_id', '2'); // ID 2: Estagiário
+        localStorage.setItem('@JurisFlow:perfil_id', '2'); 
         navigate('/dashboard');
       } else {
         setErro('Credenciais inválidas. Verifique seu login e senha.');
@@ -76,62 +67,77 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center justify-center p-4">
-      <div className="bg-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
+    <div className="min-h-screen bg-[#0b1325] flex flex-col items-center justify-center p-4 antialiased">
+      <div className="bg-white px-10 py-12 rounded-[24px] shadow-xl w-full max-w-[460px] border border-slate-100">
         
-        <div className="text-center mb-8">
-          <div className="text-4xl mb-2">⚖️</div>
-          <h1 className="text-3xl font-extrabold text-amber-500 tracking-tight">JurisFlow</h1>
-          <p className="text-sm text-slate-400 mt-1">Gestão Inteligente para Advocacia</p>
+        {/* Cabeçalho da Identidade Visual */}
+        <div className="text-center mb-8 flex flex-col items-center">
+          {/* Logo SVG Vetorizado Exato */}
+          <svg className="w-10 h-10 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://w3.org">
+            <path d="M7 6H17M7 11H17M12 4V20M9 20H15M10 6C10 7.5 11 8.5 12 8.5C13 8.5 14 7.5 14 6M10 11C10 12.5 11 13.5 12 13.5C13 13.5 14 12.5 14 11" stroke="#c5a473" strokeWidth="1.8" strokeLinecap="round"/>
+          </svg>
+          
+          <h1 className="text-3xl font-bold text-[#0e1f38] tracking-widest font-serif uppercase">JurisFlow</h1>
+          <span className="text-[11px] font-extrabold text-[#c5a473] tracking-widest uppercase mt-0.5 block">Plataforma Web</span>
+          
+          {/* Linha separadora discreta sob a descrição */}
+          <p className="text-xs text-slate-500 font-medium mt-4 max-w-[260px] mx-auto relative after:content-[''] after:block after:w-16 after:h-[1px] after:bg-[#c5a473]/40 after:mx-auto after:mt-3">
+            Gestão inteligente para escritórios de advocacia
+          </p>
         </div>
 
         {erro && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-sm mb-4 text-center font-medium">
+          <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-xs font-bold mb-4 text-center">
             {erro}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-2">Usuário ou Login</label>
+            <label className="block text-[11px] font-extrabold text-[#0e1f38] uppercase tracking-wider mb-1.5">
+              E-mail de Acesso
+            </label>
             <input
               type="text"
               required
               value={login}
               onChange={(e) => setLogin(e.target.value)}
-              placeholder="Digite seu usuário"
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 transition-colors placeholder-slate-500"
+              placeholder="Ex: milena9919@gmail.com"
+              className="w-full px-4 py-3 bg-[#e8f0fe] border border-transparent rounded-xl focus:outline-none focus:border-[#c5a473] text-[#0e1f38] font-medium text-sm transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-2">Senha</label>
+            <div className="flex justify-between items-center mb-1.5">
+              <label className="text-[11px] font-extrabold text-[#0e1f38] uppercase tracking-wider">
+                Senha
+              </label>
+              <a href="#esqueci" className="text-[11px] font-bold text-[#c5a473]/90 hover:text-[#c5a473] transition-colors">
+                Esqueceu a senha?
+              </a>
+            </div>
             <input
               type="password"
               required
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 transition-colors placeholder-slate-500"
+              className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:outline-none focus:border-[#c5a473] text-[#0e1f38] text-sm transition-all"
             />
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" className="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-0 focus:ring-offset-0" />
-              <span className="text-slate-400">Lembrar de mim</span>
-            </label>
-            <a href="#esqueci" className="text-amber-500 hover:text-amber-400 font-medium transition-colors">
-              Esqueci minha senha
-            </a>
-          </div>
-
-          <button type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl shadow-lg transition-all transform active:scale-98 cursor-pointer">
-            Acessar Sistema
+          <button 
+            type="submit" 
+            className="w-full py-3.5 bg-[#0e1f38] hover:bg-[#162f54] text-white text-xs font-extrabold uppercase tracking-widest rounded-xl shadow-md transition-all active:scale-[0.99] cursor-pointer mt-2"
+          >
+            Entrar no Sistema
           </button>
         </form>
       </div>
-      <p className="text-xs text-slate-500 mt-6">JurisFlow &copy; {new Date().getFullYear()} — Sistema em conformidade com a LGPD</p>
+      
+      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-6">
+        JurisFlow &copy; 2026
+      </p>
     </div>
   );
 }
