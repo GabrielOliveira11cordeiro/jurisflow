@@ -71,11 +71,13 @@ export default function Login() {
       <div className="bg-white px-10 py-12 rounded-[24px] shadow-xl w-full max-w-[460px] border border-slate-100">
         
         {/* Cabeçalho da Identidade Visual */}
-        <div className="text-center mb-8 flex flex-col items-center">
-          {/* Logo SVG Vetorizado Exato */}
-          <svg className="w-10 h-10 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://w3.org">
-            <path d="M7 6H17M7 11H17M12 4V20M9 20H15M10 6C10 7.5 11 8.5 12 8.5C13 8.5 14 7.5 14 6M10 11C10 12.5 11 13.5 12 13.5C13 13.5 14 12.5 14 11" stroke="#c5a473" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
+        <div className="text-center mb-8">
+          {/* Símbolo da Balança estilizado em Dourado */}
+          <div className="text-juris-gold text-4xl mb-2 flex justify-center">
+            <svg xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v17.25m0-17.25a3.75 3.75 0 1 1-7.5 0M12 3a3.75 3.75 0 1 1 7.5 0M4.5 19.5h15M5.625 12h12.75M12 12h.008v.008H12V12Zm0-6h.008v.008H12V6Zm0 6h.008v.008H12V12Z" />
+            </svg>
+          </div>
           
           <h1 className="text-3xl font-bold text-[#0e1f38] tracking-widest font-serif uppercase">JurisFlow</h1>
           <span className="text-[11px] font-extrabold text-[#c5a473] tracking-widest uppercase mt-0.5 block">Plataforma Web</span>
