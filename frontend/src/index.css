@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@theme {
+  /* Capturando os tons exatos da imagem do Jurisflow */
+  --color-juris-blue: #0b1f3b;  /* Azul Marinho Profundo */
+  --color-juris-gold: #c5a880;  /* Dourado/Bege Sofisticado */
+  --color-juris-dark: #071324;  /* Um tom de azul ainda mais escuro para o fundo da tela */
+}
