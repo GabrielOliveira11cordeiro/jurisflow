@@ -1,6 +1,11 @@
 import models from '../models/index.js';
 const { Usuario } = models;
 
+const semSenha = (usuario) => {
+    const { senha, ...dados } = usuario.toJSON();
+    return dados;
+};
+
 export const createUsuario = async (req, res) => {
     try {
         const usuario = await Usuario.create({
@@ -10,8 +15,14 @@ export const createUsuario = async (req, res) => {
             senha: req.body.senha,
             perfil_id: req.body.perfil_id,
         });
-        res.status(201).json(usuario);
-    } catch (error) {
+        res.status(201).json(semSenha(usuario));
+    }    catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).json({ message: 'Login ou e-mail já cadastrado.' });
+        }
+        if (error.name === 'SequelizeForeignKeyConstraintError') {
+            return res.status(400).json({ message: 'Perfil de acesso inválido.' });
+        }
         res.status(400).json({ message: error.message });
     }
 }
@@ -40,7 +51,7 @@ export const updateUsuario = async (req, res) => {
         const usuario = await Usuario.findByPk(req.params.id);
         if (!usuario) return res.status(404).json({ message: 'Usuário não encontrado' });
         await usuario.update(req.body);
-        res.status(200).json(usuario);
+        res.status(200).json(semSenha(usuario));
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

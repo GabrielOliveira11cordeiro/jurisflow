@@ -1,6 +1,5 @@
 import models from '../models/index.js';
-const { Pasta } = models;
-
+const { Pasta, PastaResponsavel } = models;
 export const createPasta = async (req, res) => {
     try {
         const pasta = await Pasta.create({
@@ -10,6 +9,15 @@ export const createPasta = async (req, res) => {
             status: req.body.status,
             prioridade: req.body.prioridade,
         });
+
+        if (req.body.responsavel_id) {
+            await PastaResponsavel.create({
+                pasta_id: pasta.id,
+                usuario_id: req.body.responsavel_id,
+                data_inicio: new Date(),
+            });
+        }
+
         res.status(201).json(pasta);
     } catch (error) {
         res.status(400).json({ message: error.message });

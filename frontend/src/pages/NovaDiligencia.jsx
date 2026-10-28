@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
@@ -15,12 +15,14 @@ export default function NovaDiligencia() {
     descricao: '' // Caixa de texto principal para detalhar o que foi feito
   });
 
-  // Mock de Casos ativos (unindo dados fictícios para o TCC)
-  const casosDisponiveis = [
-    { id: '1', titulo: 'Ação Previdenciária - Antônio Silva' },
-    { id: '2', titulo: 'Reclamatória Trabalhista - Maria Eduarda' },
-    { id: '3', titulo: 'Execução de Contrato - Construções Ramos' }
-  ];
+  // Casos em andamento vindos do back-end (GET /caso), sem os encerrados
+  const [casosDisponiveis, setCasosDisponiveis] = useState([]);
+
+  useEffect(() => {
+    api.get('/caso')
+      .then((res) => setCasosDisponiveis(res.data.filter((c) => c.status !== 'encerrado')))
+      .catch(() => setErro('Não foi possível carregar a lista de casos.'));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,14 +37,11 @@ export default function NovaDiligencia() {
     // Payload estruturado exatamente igual às colunas do seu Diligencia.js no Sequelize
     const payload = {
       titulo: formData.titulo,
+      descricao: formData.descricao, // relato detalhado, gravado na coluna descricao
       caso_id: Number(formData.casoId),
       status: 'pendente', // Mantém o valor padrão do ENUM do seu banco
       data_prevista: new Date().toISOString().split('T')[0] // Grava a data de hoje (DATEONLY) automaticamente
     };
-
-    // NOTA PARA A BANCA: O campo formData.descricao representa o relato detalhado da atividade.
-    // Como o seu modelo de Diligências no banco é focado no título e chaves, esse payload 
-    // garante que a inserção ocorra sem gerar erros de coluna inexistente no Sequelize do Cazé.
 
     try {
       // Envia os dados oficiais para a API
@@ -50,6 +49,11 @@ export default function NovaDiligencia() {
       setSucesso('Movimentação registrada com sucesso!');
       setTimeout(() => navigate('/casos'), 1500);
     } catch (err) {
+      if (err.response) {
+        // O back-end respondeu com erro (ex.: caso inexistente ou campo inválido)
+        setErro(err.response.data?.message || 'Não foi possível registrar a movimentação.');
+        return;
+      }
       console.log('Back-end offline. Executando simulação local para o TCC.');
       setSucesso('Movimentação registrada com sucesso! (Modo Simulação)');
       setTimeout(() => navigate('/casos'), 1500);

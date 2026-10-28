@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
+import api from '../services/api';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -9,19 +11,26 @@ export default function Dashboard() {
 
   // 📊 Estatísticas Gerenciais baseadas nos seus Models (US23)
   // 🟢 MUDOU: Ajustamos a contagem para refletir a sua listagem real (3 casos ativos no total)
-  const metricas = {
-    clientesTotais: 3,        // Mapeia do Cliente.js
-    casosAtivosTotal: 3,      // Mapeia do Caso.js (Total Geral de demandas)
-    comProcessoJudicial: 2,   // Mapeia de quantos Casos possuem Processo.js vinculado
-    fasePreProcessual: 1,     // Mapeia de quantos Casos estão na fase "inicial" sem processo
-    diligenciasPendentes: 4   // Mapeia do Diligencia.js (status: 'pendente')
-  };
+  const [metricas, setMetricas] = useState({
+    clientesTotais: 0,        // Mapeia do Cliente.js
+    casosAtivosTotal: 0,      // Mapeia do Caso.js (Total Geral de demandas)
+    comProcessoJudicial: 0,   // Mapeia de quantos Casos possuem Processo.js vinculado
+    fasePreProcessual: 0,     // Mapeia de quantos Casos estão na fase "inicial" sem processo
+    diligenciasPendentes: 0   // Mapeia do Diligencia.js (status: 'pendente')
+  });
 
   // ⚠️ Alertas automáticos exigidos na US22 (Casos/Processos sem atualização há mais de 30 dias)
-  const alertasCriticos = [
-    { id: 1, titulo: 'Execução de Contrato - Ramos', dias: 42, responsavel: 'Dra. Milena' },
-    { id: 2, titulo: 'Ação Previdenciária - Antônio', dias: 35, responsavel: 'Dr. Gabriel Cordeiro' }
-  ];
+  const [alertasCriticos, setAlertasCriticos] = useState([]);
+
+  // Busca os dados reais no back-end
+  useEffect(() => {
+    api.get('/dashboard')
+      .then((res) => {
+        setMetricas(res.data.metricas);
+        setAlertasCriticos(res.data.alertasCriticos);
+      })
+      .catch((err) => console.error('Erro ao carregar o dashboard:', err));
+  }, []);
 
   return (
     <Layout>

@@ -7,7 +7,7 @@ export const createAtualizacaoProcesso = async (req, res) => {
             processo_id: req.body.processo_id,
             descricao: req.body.descricao,
             usuario_id: req.body.usuario_id,
-            data_atualizacao: req.body.data_atualizacao,
+            data_atualizacao: req.body.data_atualizacao || new Date(),
         });
         res.status(201).json(registro);
     } catch (error) {
@@ -17,7 +17,14 @@ export const createAtualizacaoProcesso = async (req, res) => {
 
 export const getAllAtualizacoesProcesso = async (req, res) => {
     try {
-        const registros = await AtualizacaoProcesso.findAll({ include: ['processo', 'usuario'] });
+        const where = {};
+        if (req.query.processo_id) where.processo_id = req.query.processo_id;
+
+        const registros = await AtualizacaoProcesso.findAll({
+            where,
+            include: ['processo', 'usuario'],
+            order: [['data_atualizacao', 'DESC'], ['id', 'DESC']],
+        });
         res.status(200).json(registros);
     } catch (error) {
         res.status(500).json({ message: error.message });
