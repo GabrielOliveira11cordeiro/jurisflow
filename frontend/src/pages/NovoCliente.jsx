@@ -43,12 +43,23 @@ export default function NovoCliente() {
 
     // 🌟 Sincronização Perfeita com o Modelo Cliente.js do Sequelize:
     // Filtramos e enviamos apenas as propriedades exatas que existem no seu Model.
-    const payload = {
+       const payload = {
       tipo_pessoa: tipoPessoa === 'PF' ? 'fisica' : 'juridica', // Converte para o ENUM do banco
       nome: formData.nome,
       cpf: tipoPessoa === 'PF' ? formData.cpf : null,
       cnpj: tipoPessoa === 'PJ' ? formData.cnpj : null,
-      status: true // Mapeia para o defaultValue: true do Sequelize
+      status: true, // Mapeia para o defaultValue: true do Sequelize
+      email: formData.email,
+      telefone: formData.telefone,
+      endereco: formData.endereco,
+      rg: tipoPessoa === 'PF' ? formData.rg : null,
+      data_nascimento: tipoPessoa === 'PF' ? formData.dataNascimento : null,
+      nome_pais: tipoPessoa === 'PF' ? formData.nomePais : null,
+      senha_gov: tipoPessoa === 'PF' ? formData.senhaGov : null,
+      rg_representante: tipoPessoa === 'PJ' ? formData.rgRepresentante : null,
+      cpf_representante: tipoPessoa === 'PJ' ? formData.cpfRepresentante : null,
+      tipo_processo: formData.tipoProcesso,
+      observacoes: formData.observacoes,
     };
 
     // 💡 Dica de TCC: Se o Cazé decidir salvar os outros campos da US05 (telefone, endereço, etc.) 

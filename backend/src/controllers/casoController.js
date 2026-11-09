@@ -9,21 +9,20 @@ export const createCaso = async (req, res) => {
             fase: req.body.fase,
             status: req.body.status,
             responsavel_principal_id: req.body.responsavel_principal_id,
+            observacao_pre_processual: req.body.observacao_pre_processual || null,
         });
         res.status(201).json(caso);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 }
-
 export const getAllCasos = async (req, res) => {
-    try {
-        const casos = await Caso.findAll({ include: ['pasta', 'responsavelPrincipal'] });
-        res.status(200).json(casos);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
+const casos = await Caso.findAll({
+    include: ['pasta', 'responsavelPrincipal', 'processos'],
+    order: [['id', 'ASC']],
+});
+    res.status(200).json(casos);
+} 
 
 export const getCasoById = async (req, res) => {
     try {

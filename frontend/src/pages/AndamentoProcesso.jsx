@@ -1,43 +1,100 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
 
 export default function AndamentoProcesso() {
   const navigate = useNavigate();
-  const { id } = useParams(); // Pega o ID do caso/processo vindo da URL
+  const { id } = useParams(); // ID do caso vindo da URL (botão "Detalhes do Processo")
   
   const [novoAndamento, setNovoAndamento] = useState('');
   const [sucesso, setSucesso] = useState('');
+  const [erro, setErro] = useState('');
 
-  // Mock dos dados fixos do Processo (Mapeado com o seu Processo.js)
-  const dadosProcesso = {
-    numero_processo: '0001234-56.2026.8.16.0001',
-    comarca: 'Joaquim Távora',
-    vara: 'Vara Cível',
-    titulo_caso: 'Ação Previdenciária - Antônio Silva'
+  // Dados fixos do Processo, vindos do back-end (Processo.js)
+  const [dadosProcesso, setDadosProcesso] = useState({
+    numero_processo: '',
+    comarca: '',
+    vara: '',
+    titulo_caso: ''
+  });
+  const [processoId, setProcessoId] = useState(null);
+
+  // Histórico de Atualizações em ordem cronológica decrescente (US17), vindo do back-end
+  const [historicoFake, setHistoricoFake] = useState([]);
+
+  const carregarHistorico = async (idProcesso) => {
+    const res = await api.get('/atualizacao-processo', { params: { processo_id: idProcesso } });
+    setHistoricoFake(res.data.map((a) => ({
+      id: a.id,
+      data: new Date(a.data_atualizacao).toLocaleDateString('pt-BR'),
+      descricao: a.descricao,
+      registrado_por: a.usuario?.nome || 'Usuário'
+    })));
   };
 
-  // Mock do Histórico de Atualizações em ordem cronológica decrescente (US17)
-  const historicoFake = [
-    { id: 1, data: '15/09/2026', descricao: 'Audiência de instrução e julgamento designada para o dia 20/10/2026.', registrado_por: 'Dr. Gabriel Cordeiro' },
-    { id: 2, data: '21/08/2026', descricao: 'Petição Inicial protocolada com sucesso. Aguardando citação do réu.', registrado_por: 'Milena Romano' }
-  ];
+  useEffect(() => {
+    api.get(`/caso/${id}`)
+      .then(async (res) => {
+        const caso = res.data;
+        const processo = caso.processos?.[0];
+
+        if (!processo) {
+          setDadosProcesso({
+            numero_processo: 'Sem processo vinculado',
+            comarca: '-',
+            vara: '-',
+            titulo_caso: caso.titulo
+          });
+          setErro('Este caso ainda não possui processo vinculado.');
+          return;
+        }
+
+        setProcessoId(processo.id);
+        setDadosProcesso({
+          numero_processo: processo.numero_processo,
+          comarca: processo.comarca || '-',
+          vara: processo.vara || '-',
+          titulo_caso: caso.titulo
+        });
+        await carregarHistorico(processo.id);
+      })
+      .catch(() => setErro('Não foi possível carregar os dados do processo.'));
+  }, [id]);
 
   const handleSubmitAndamento = async (e) => {
     e.preventDefault();
     setSucesso('');
+    setErro('');
+
+    const usuario = JSON.parse(localStorage.getItem('@JurisFlow:usuario'));
+
+    if (!processoId) {
+      setErro('Este caso não possui processo para receber andamentos.');
+      return;
+    }
+    if (!usuario?.id) {
+      setErro('Não foi possível identificar o usuário logado. Saia e entre novamente.');
+      return;
+    }
 
     const payload = {
       descricao: novoAndamento,
-      processo_id: Number(id) // Vincula a FK na tabela
+      processo_id: processoId, // Vincula a FK na tabela
+      usuario_id: usuario.id // Quem registrou o andamento
     };
 
     try {
-      await api.post('/processos/atualizacoes', payload);
+      await api.post('/atualizacao-processo', payload);
       setSucesso('Andamento processual lançado com sucesso!');
       setNovoAndamento('');
+      carregarHistorico(processoId).catch(() => {});
     } catch (err) {
+      if (err.response) {
+        // O back-end respondeu com erro
+        setErro(err.response.data?.message || 'Não foi possível lançar o andamento.');
+        return;
+      }
       console.log('Back-end offline. Simulando andamento lançado no TCC.');
       setSucesso('Andamento processual lançado! (Modo Simulação)');
       setNovoAndamento('');
@@ -86,6 +143,11 @@ export default function AndamentoProcesso() {
           {sucesso && (
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs p-3 rounded-xl text-center font-bold mb-4">
               {sucesso}
+            </div>
+          )}
+          {erro && (
+            <div className="bg-rose-50 border border-rose-200 text-rose-500 text-xs p-3 rounded-xl text-center font-bold mb-4">
+              {erro}
             </div>
           )}
 

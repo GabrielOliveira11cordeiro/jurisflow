@@ -1,16 +1,28 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom' 
 import Layout from '../components/Layout'
+import api from '../services/api'
 
 export default function Casos() {
   const navigate = useNavigate() 
   const perfilId = localStorage.getItem('@JurisFlow:perfil_id');
   const podeInteragirComCaso = perfilId === '3' || perfilId === '1' || perfilId === '2';
 
-  const casosFake = [
-    { id: 1, titulo: 'Ação Previdenciária - Antônio Silva', fase: 'inicial', status: 'ativo', pasta_id: 101, responsavel_principal: 'Dr. Gabriel Cordeiro', tem_processo: true },
-    { id: 2, titulo: 'Reclamatória Trabalhista - Maria Eduarda', fase: 'instrucao', status: 'ativo', pasta_id: 102, responsavel_principal: 'Dr. Gabriel Cordeiro', tem_processo: true },
-    { id: 3, titulo: 'Execução de Contrato - Construções Ramos', fase: 'execucao', status: 'suspenso', pasta_id: 103, responsavel_principal: 'Dra. Milena', tem_processo: false },
-  ]
+  // Lista de casos vinda do back-end (GET /caso)
+  const [casosFake, setCasosFake] = useState([])
+
+  useEffect(() => {
+    api.get('/caso')
+      .then((res) => {
+        // ajusta o formato do back-end para o que a tabela já lê
+        setCasosFake(res.data.map((c) => ({
+          ...c,
+          responsavel_principal: c.responsavelPrincipal?.nome || 'Sem responsável',
+          tem_processo: (c.processos?.length || 0) > 0,
+        })))
+      })
+      .catch((err) => console.error('Erro ao carregar casos:', err))
+  }, [])
 
   const traduzirFase = (fase) => {
     const fases = { inicial: 'Petição Inicial', instrucao: 'Fase de Instrução', recursal: 'Fase Recursal', execucao: 'Fase de Execução', encerrado: 'Encerrado' }

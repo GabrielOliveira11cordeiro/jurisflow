@@ -1,46 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
+import api from '../services/api';
 
 export default function Historico() {
-  // Dados fictícios estruturados exatamente como o HistoricoAtividade.js do banco (US18)
-  const historicoFake = [
-    {
-      id: 1,
-      entidade: 'diligencias',
-      entidade_id: 45,
-      acao: 'criacao',
-      descricao: 'Gabriel Cordeiro criou a diligência "Solicitar PPP à empresa".',
-      data_hora: '15/10/2026 às 16:45',
-      usuario_nome: 'Dr. Gabriel Cordeiro'
-    },
-    {
-      id: 2,
-      entidade: 'processos',
-      entidade_id: 10,
-      acao: 'atualizacao',
-      descricao: 'Milena Ramos registrou um novo andamento processual: "Audiência designada".',
-      data_hora: '15/10/2026 às 14:20',
-      usuario_nome: 'Dra. Milena Ramos'
-    },
-    {
-      id: 3,
-      entidade: 'clientes',
-      entidade_id: 1,
-      acao: 'criacao',
-      descricao: 'Gabriel Cordeiro cadastrou o novo cliente "Antônio Silva de Almeida".',
-      data_hora: '14/10/2026 às 09:15',
-      usuario_nome: 'Dr. Gabriel Cordeiro'
-    },
-    {
-      id: 4,
-      entidade: 'casos',
-      entidade_id: 3,
-      acao: 'atualizacao',
-      descricao: 'João Silva alterou o status do caso #103 para "Suspenso".',
-      data_hora: '13/10/2026 às 11:30',
-      usuario_nome: 'João Silva (Estagiário)'
-    }
-  ];
+  // Histórico de atividades vindo do back-end (US18), no formato do HistoricoAtividade.js
+  const [historicoFake, setHistoricoFake] = useState([]);
+
+  useEffect(() => {
+    api.get('/historico-atividade')
+      .then((res) => {
+        setHistoricoFake(res.data.map((h) => {
+          const data = new Date(h.createdAt);
+          const hora = data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+          return {
+            id: h.id,
+            entidade: h.entidade,
+            entidade_id: h.entidade_id,
+            acao: h.acao,
+            // o nome de quem fez a ação vem antes do texto gravado no banco
+            descricao: h.usuario?.nome ? `${h.usuario.nome} ${h.descricao}` : h.descricao,
+            data_hora: `${data.toLocaleDateString('pt-BR')} às ${hora}`,
+            usuario_nome: h.usuario?.nome
+          };
+        }));
+      })
+      .catch((err) => console.error('Erro ao carregar o histórico:', err));
+  }, []);
 
   // Helper visual para colocar cores nos distintivos (badges) de ação
   const obterEstiloAcao = (acao) => {

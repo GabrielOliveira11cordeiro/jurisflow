@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import api from '../services/api';
@@ -25,17 +25,20 @@ export default function NovoCaso() {
     observacaoPreProcessual: ''
   });
 
-  // Mocks para simulação no TCC
-  const clientesDisponiveis = [
-    { id: '1', nome: 'Antônio Silva de Almeida' },
-    { id: '2', nome: 'Maria Eduarda Rodrigues' },
-    { id: '3', nome: 'Construções Ramos LTDA' }
-  ];
+  // Listas vindas do back-end: clientes ativos e usuários que podem ser responsáveis
+  const [clientesDisponiveis, setClientesDisponiveis] = useState([]);
+  const [advogadosDisponiveis, setAdvogadosDisponiveis] = useState([]);
 
-  const advogadosDisponiveis = [
-    { id: '1', nome: 'Dr. Gabriel Cordeiro' },
-    { id: '99', nome: 'Dra. Milena Ramos' }
-  ];
+  useEffect(() => {
+    api.get('/cliente')
+      .then((res) => setClientesDisponiveis(res.data.filter((c) => c.status === true)))
+      .catch(() => setErro('Não foi possível carregar a lista de clientes.'));
+
+    // Estagiários (perfil 2) não aparecem como responsáveis
+    api.get('/usuario')
+      .then((res) => setAdvogadosDisponiveis(res.data.filter((u) => u.status === true && u.perfil_id !== 2)))
+      .catch(() => setErro('Não foi possível carregar a lista de responsáveis.'));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,24 +65,26 @@ export default function NovoCaso() {
       // 🌟 PASSO 1: Criar a Pasta em segundo plano automaticamente
       const payloadPasta = {
         numero: `PST-${Date.now().toString().slice(-4)}`, 
-        status: formData.status,
+        status: 'aberta', // toda pasta nova nasce aberta (ENUM da tabela pastas)
         prioridade: 'media',
         cliente_id: Number(formData.clienteId),
         responsavel_id: Number(formData.responsavelPrincipalId)
       };
+    const responsePasta = await api.post('/pastas', payloadPasta);
 
-      const responsePasta = await api.post('/pastas', payloadPasta);
-      
-      // Pega o ID da pasta criada pelo back-end (ou gera um reserva caso caia no catch)
-      const pastaIdCriada = responsePasta.data?.id || Math.floor(Math.random() * 1000);
+      const pastaIdCriada = responsePasta.data?.id;
 
-      // 🌟 PASSO 2: Criar o Caso vinculado à Pasta gerada acima
+    if (!pastaIdCriada) {
+      throw new Error('A API não retornou o ID da pasta criada.');
+    }
+          // 🌟 PASSO 2: Criar o Caso vinculado à Pasta gerada acima
       const payloadCaso = {
         titulo: formData.titulo,
         fase: temProcesso === 'sim' ? 'instrucao' : 'inicial', 
         status: formData.status,
         pasta_id: Number(pastaIdCriada), // Chave estrangeira preenchida automaticamente
-        responsavel_principal_id: Number(formData.responsavelPrincipalId)
+        responsavel_principal_id: Number(formData.responsavelPrincipalId),
+        observacao_pre_processual: temProcesso === 'nao' ? formData.observacaoPreProcessual : null
       };
 
       const responseCaso = await api.post('/casos', payloadCaso);
@@ -91,7 +96,8 @@ export default function NovoCaso() {
           comarca: formData.comarca,
           vara: formData.vara,
           situacao: formData.situacao,
-          caso_id: responseCaso.data.id
+          caso_id: responseCaso.data.id,
+          responsavel_id: Number(formData.responsavelPrincipalId)
         };
         await api.post('/processos', payloadProcesso);
       }
@@ -99,6 +105,11 @@ export default function NovoCaso() {
       setSucesso('Caso e Pasta gerados com sucesso!');
       setTimeout(() => navigate('/casos'), 1500);
     } catch (err) {
+      if (err.response) {
+        // O back-end respondeu com erro (ex.: campo inválido ou chave inexistente)
+        setErro(err.response.data?.message || 'Não foi possível criar o caso.');
+        return;
+      }
       console.log('Back-end offline. Executando simulação de Pasta + Caso no TCC.');
       setSucesso('Caso e Pasta criados! (Modo Simulação)');
       setTimeout(() => navigate('/casos'), 1500);

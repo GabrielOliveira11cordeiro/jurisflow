@@ -43,6 +43,6 @@ export const deletePastaResponsavel = async (req, res) => {
         await registro.destroy();
         res.status(200).json({ message: 'Responsável removido da pasta com sucesso' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message }); 
     }
 }

@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
+import api from '../services/api'
 
 export default function Clientes() {
   const navigate = useNavigate()
@@ -11,32 +13,14 @@ export default function Clientes() {
   // Estagiário (ID '2') não cadastra ou altera clientes.
   const podeCadastrarEAlterar = perfilId === '3' || perfilId === '1'; 
   
-  const clientesFake = [
-    { 
-      id: 1, 
-      nome: 'Antônio Silva de Almeida', 
-      tipo_pessoa: 'fisica',
-      cpf: '123.456.789-00',
-      cnpj: null,
-      status: true // true no Sequelize mapeia para Ativo
-    },
-    { 
-      id: 2, 
-      nome: 'Maria Eduarda Rodrigues', 
-      tipo_pessoa: 'fisica',
-      cpf: '987.654.321-11', 
-      cnpj: null,
-      status: true
-    },
-    { 
-      id: 3, 
-      nome: 'Construções Ramos LTDA', 
-      tipo_pessoa: 'juridica',
-      cpf: null,
-      cnpj: '12.345.678/0001-99', 
-      status: false // false mapeia para Inativo
-    },
-  ]
+  // Lista de clientes vinda do back-end (GET /cliente)
+  const [clientesFake, setClientesFake] = useState([])
+
+  useEffect(() => {
+    api.get('/cliente')
+      .then((res) => setClientesFake(res.data))
+      .catch((err) => console.error('Erro ao carregar clientes:', err))
+  }, [])
 
    return (
     <Layout>

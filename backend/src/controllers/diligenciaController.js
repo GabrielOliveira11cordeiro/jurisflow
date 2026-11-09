@@ -6,6 +6,7 @@ export const createDiligencia = async (req, res) => {
         const diligencia = await Diligencia.create({
             caso_id: req.body.caso_id,
             titulo: req.body.titulo,
+            descricao: req.body.descricao || null,
             data_prevista: req.body.data_prevista,
             status: req.body.status,
         });

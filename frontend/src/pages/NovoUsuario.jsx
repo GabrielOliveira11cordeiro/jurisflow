@@ -18,10 +18,11 @@ export default function NovoUsuario() {
   });
 
   // Lista dos Perfis Oficiais mapeada com os IDs de permissão do TCC
+  // (os ids precisam ser os mesmos da tabela perfis do banco)
   const perfisDisponiveis = [
     { id: '1', nome: 'Advogado' },
     { id: '2', nome: 'Estagiário' },
-    { id: '99', nome: 'Administrador' }
+    { id: '3', nome: 'Administrador' }
   ];
 
   const handleChange = (e) => {
@@ -50,7 +51,12 @@ export default function NovoUsuario() {
       setSucesso('Novo integrante cadastrado com sucesso!');
       setTimeout(() => navigate('/dashboard'), 1500);
     } catch (err) {
-      console.log('Erro ao salvar. Verifique se o login/e-mail já existem ou use a simulação.');
+      if (err.response) {
+        // O back-end respondeu com erro (ex.: login ou e-mail já cadastrado)
+        setErro(err.response.data?.message || 'Não foi possível cadastrar o usuário.');
+        return;
+      }
+      console.log('Back-end offline. Usando a simulação.');
       setSucesso('Usuário cadastrado com sucesso! (Modo Simulação)');
       setTimeout(() => navigate('/dashboard'), 1500);
     }

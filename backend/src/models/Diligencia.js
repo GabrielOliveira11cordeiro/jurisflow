@@ -5,6 +5,7 @@ class Diligencia extends Model {
         super.init(
             {
                 titulo: { type: DataTypes.STRING, allowNull: false },
+                descricao: { type: DataTypes.TEXT, allowNull: true },
                 data_prevista: { type: DataTypes.DATEONLY, allowNull: true },
                 status: {
                     type: DataTypes.ENUM('pendente', 'em_andamento', 'concluida', 'cancelada'),

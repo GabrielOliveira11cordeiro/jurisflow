@@ -1,4 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
+import bcrypt from 'bcryptjs';
 
 class Usuario extends Model {
     static init(sequelize) {
@@ -10,7 +11,19 @@ class Usuario extends Model {
                 senha: { type: DataTypes.STRING, allowNull: false },
                 status: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             },
-            { sequelize, tableName: 'usuarios' },
+            {
+                sequelize,
+                tableName: 'usuarios',
+                defaultScope: { attributes: { exclude: ['senha'] } },
+                scopes: { comSenha: {} },
+                hooks: {
+                    beforeSave: async (usuario) => {
+                        if (usuario.changed('senha')) {
+                            usuario.senha = await bcrypt.hash(usuario.senha, 10);
+                        }
+                    },
+                },
+            },
         );
     }
 

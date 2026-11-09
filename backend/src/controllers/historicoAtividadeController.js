@@ -18,13 +18,16 @@ export const createHistoricoAtividade = async (req, res) => {
 
 export const getAllHistoricoAtividades = async (req, res) => {
     try {
-        const registros = await HistoricoAtividade.findAll({ include: 'usuario' });
+        const registros = await HistoricoAtividade.findAll({
+            include: 'usuario',
+            order: [['id', 'DESC']],
+            limit: 100,
+        });
         res.status(200).json(registros);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
-
 export const getHistoricoAtividadeById = async (req, res) => {
     try {
         const registro = await HistoricoAtividade.findByPk(req.params.id, { include: 'usuario' });
