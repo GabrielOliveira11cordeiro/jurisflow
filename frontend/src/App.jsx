@@ -9,6 +9,8 @@ import NovaDiligencia from './pages/NovaDiligencia'
 import AndamentoProcesso from './pages/AndamentoProcesso'
 import Historico from './pages/Historico'
 import NovoUsuario from './pages/NovoUsuario'
+import EsqueciSenha from './pages/EsqueciSenha'
+import Notificacoes from './pages/Notificacoes'
 
 // Importamos apenas o Guardião de Segurança aqui
 import PermissaoGuard from './components/PermissaoGuard'
@@ -20,8 +22,9 @@ function App() {
         {/* Quando abrir o sistema, joga direto para a tela de Login */}
         <Route path="/" element={<Navigate to="/login" />} />
         
-        {/* Rota Pública de Autenticação */}
+        {/* Rotas Públicas de Autenticação */}
         <Route path="/login" element={<Login />} />
+        <Route path="/esqueci-senha" element={<EsqueciSenha />} />
 
         {/* 🔒 Rotas Protegidas (Sem o <Layout> aqui, pois você já importa dentro delas) */}
         
@@ -75,6 +78,13 @@ function App() {
         <Route path="/historico" element={
           <PermissaoGuard perfisPermitidos={['3', '99', '1', '2']}>
             <Historico />
+          </PermissaoGuard>
+        } />
+
+        {/* 🔔 Central de Notificações -> 🌟 Liberada para todos os perfis logados */}
+        <Route path="/notificacoes" element={
+          <PermissaoGuard perfisPermitidos={['3', '99', '1', '2']}>
+            <Notificacoes />
           </PermissaoGuard>
         } />
         

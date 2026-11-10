@@ -3,7 +3,6 @@ import Layout from '../components/Layout';
 import api from '../services/api';
 
 export default function Historico() {
-  // Histórico de atividades vindo do back-end (US18), no formato do HistoricoAtividade.js
   const [historicoFake, setHistoricoFake] = useState([]);
 
   useEffect(() => {
@@ -18,7 +17,6 @@ export default function Historico() {
             entidade: h.entidade,
             entidade_id: h.entidade_id,
             acao: h.acao,
-            // o nome de quem fez a ação vem antes do texto gravado no banco
             descricao: h.usuario?.nome ? `${h.usuario.nome} ${h.descricao}` : h.descricao,
             data_hora: `${data.toLocaleDateString('pt-BR')} às ${hora}`,
             usuario_nome: h.usuario?.nome
@@ -45,7 +43,7 @@ export default function Historico() {
         {/* Cabeçalho */}
         <div className="mb-8 border-b border-slate-100 pb-4">
           <h1 className="text-2xl font-extrabold text-juris-blue mb-1">Histórico de Atividades</h1>
-          <p className="text-slate-500 text-sm">Auditoria completa de ações realizadas no sistema (Sequelize `historico_atividades`).</p>
+          <p className="text-slate-500 text-sm">Auditoria completa de ações realizadas no sistema.</p>
         </div>
 
         {/* Linha do Tempo (Timeline) Simples e Direta */}
@@ -66,18 +64,18 @@ export default function Historico() {
                     {item.descricao}
                   </p>
                   
-                  {/* Detalhes de Data/Hora e Usuário */}
+                  {/* Detalhes de Data/Hora e Módulo */}
                   <div className="flex items-center space-x-2 text-xs text-slate-400">
                     <span>🕒 {item.data_hora}</span>
                     <span>•</span>
-                    <span>Tabela: <strong className="font-mono text-slate-500">{item.entidade}</strong></span>
+                    <span>Módulo: <strong className="capitalize text-slate-500">{item.entidade}</strong></span>
                   </div>
                 </div>
 
-                {/* Badge da Ação (Criação / Atualização) */}
+                {/* Badge da Ação (Criação / Ajuste / Exclusão) */}
                 <div className="flex items-center">
                   <span className={`px-2.5 py-0.5 rounded-md text-xxs font-bold uppercase border ${obterEstiloAcao(item.acao)}`}>
-                    {item.acao === 'criacao' ? 'Criação' : 'Ajuste'}
+                    {item.acao === 'criacao' ? 'Criação' : item.acao === 'atualizacao' ? 'Ajuste' : 'Exclusão'}
                   </span>
                 </div>
               </div>

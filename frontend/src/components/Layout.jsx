@@ -19,13 +19,13 @@ export default function Layout({ children }) {
 
   // Lista de links de navegação da plataforma com controle de acesso por ID
   const menuItems = [
-  { text: 'Painel Principal', path: '/dashboard', icon: '📊', perfisPermitidos: ['3', '1', '2'] },
-  { text: 'Clientes', path: '/clientes', icon: '👤', perfisPermitidos: ['3', '1', '2'] }, 
-  { text: 'Casos', path: '/casos', icon: '⚖️', perfisPermitidos: ['3', '1', '2'] }, 
-  { text: 'Histórico Geral', path: '/historico', icon: '⏳', perfisPermitidos: ['3', '1', '2'] },
-  { text: 'Cadastrar Equipe', path: '/usuarios/novo', icon: '➕', perfisPermitidos: ['3']} // 🌟 Troque '99' por '3'
-]
-
+    { text: 'Painel Principal', path: '/dashboard', icon: '📊', perfisPermitidos: ['3', '1', '2'] },
+    { text: 'Clientes', path: '/clientes', icon: '👤', perfisPermitidos: ['3', '1', '2'] }, 
+    { text: 'Casos', path: '/casos', icon: '⚖️', perfisPermitidos: ['3', '1', '2'] }, 
+    { text: 'Histórico Geral', path: '/historico', icon: '⏳', perfisPermitidos: ['3', '1', '2'] },
+    { text: 'Notificações', path: '/notificacoes', icon: '🔔', perfisPermitidos: ['3', '1', '2'] },
+    { text: 'Cadastrar Equipe', path: '/usuarios/novo', icon: '➕', perfisPermitidos: ['3'] }
+  ]
 
   // Filtra os botões do menu com base nas permissões da US03
   const itensFiltrados = menuItems.filter(item => item.perfisPermitidos.includes(perfilId))
@@ -63,8 +63,12 @@ export default function Layout({ children }) {
               Plataforma Web
             </p>
 
-            {/* 🔔 CONTAINER DO SININHO ANCORADO */}
-            <div className="relative cursor-pointer inline-block mt-2">
+            {/* 🔔 CONTAINER DO SININHO ANCORADO (Clicar abre /notificacoes) */}
+            <div 
+              onClick={() => navigate('/notificacoes')}
+              className="relative cursor-pointer inline-block mt-2"
+              title="Ver todas as notificações"
+            >
               <span className="text-2xl block text-amber-400 hover:text-white transition-colors">
                 🔔
               </span>
@@ -77,18 +81,31 @@ export default function Layout({ children }) {
               )}
 
               {/* 🪟 CAIXA FLUTUANTE (Aparece ao passar o mouse sobre o sino) */}
-              <div className="absolute left-10 top-0 w-72 bg-white text-slate-800 rounded-xl shadow-2xl p-4 hidden group-hover:block border border-slate-100 text-left z-50">
-                <h4 className="text-xs font-bold text-juris-blue border-b border-slate-100 pb-2 mb-2 uppercase tracking-wider">Centro de Notificações</h4>
+              <div 
+                onClick={(e) => e.stopPropagation()}
+                className="absolute left-10 top-0 w-72 bg-white text-slate-800 rounded-xl shadow-2xl p-4 hidden group-hover:block border border-slate-100 text-left z-50"
+              >
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                  <h4 className="text-xs font-bold text-juris-blue uppercase tracking-wider">Centro de Notificações</h4>
+                </div>
+                
                 <div className="space-y-2.5 max-h-60 overflow-y-auto">
-                  {notificacoes.map(notif => (
+                  {notificacoes.slice(0, 4).map(notif => (
                     <div key={notif.id} className="p-2 bg-slate-50 rounded-lg border border-slate-100 text-xxs leading-relaxed">
-                      <span className="font-bold text-rose-500 block mb-0.5">
+                      <span className={`font-bold block mb-0.5 ${notif.tipo === 'ALERTA_ATRASO' ? 'text-rose-500' : 'text-amber-600'}`}>
                         {notif.tipo === 'ALERTA_ATRASO' ? '⚠️ Alerta de Atraso' : '📅 Nova Atribuição'}
                       </span>
                       {notif.descricao}
                     </div>
                   ))}
                 </div>
+
+                <button
+                  onClick={() => navigate('/notificacoes')}
+                  className="w-full mt-3 pt-2 border-t border-slate-100 text-center text-xxs font-extrabold text-juris-blue hover:text-juris-gold uppercase tracking-wider cursor-pointer transition-colors"
+                >
+                  Ver todas as notificações →
+                </button>
               </div>
             </div>
 
