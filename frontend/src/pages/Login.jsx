@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 
 export default function Login() {
@@ -115,9 +115,11 @@ export default function Login() {
               <label className="text-[11px] font-extrabold text-[#0e1f38] uppercase tracking-wider">
                 Senha
               </label>
-              <a href="#esqueci" className="text-[11px] font-bold text-[#c5a473]/90 hover:text-[#c5a473] transition-colors">
-                Esqueceu a senha?
-              </a>
+              <Link to="/esqueci-senha" className="text-[11px] font-bold text-[#c5a473]/90 hover:text-[#c5a473] transition-colors">
+              Esqueceu a senha?
+              </Link>
+
+
             </div>
             <input
               type="password"

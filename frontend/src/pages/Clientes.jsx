@@ -6,14 +6,11 @@ import api from '../services/api'
 export default function Clientes() {
   const navigate = useNavigate()
   
-  // 🌟 Pegamos o ID do perfil logado
   const perfilId = localStorage.getItem('@JurisFlow:perfil_id')
 
-  // 👑 Regra do TCC Corrigida: Administrador-Chefe (ID '3') e Advogado (ID '1') podem interagir.
-  // Estagiário (ID '2') não cadastra ou altera clientes.
+  // Administrador-Chefe (ID '3') e Advogado (ID '1') podem cadastrar e alterar clientes
   const podeCadastrarEAlterar = perfilId === '3' || perfilId === '1'; 
   
-  // Lista de clientes vinda do back-end (GET /cliente)
   const [clientesFake, setClientesFake] = useState([])
 
   useEffect(() => {
@@ -22,7 +19,7 @@ export default function Clientes() {
       .catch((err) => console.error('Erro ao carregar clientes:', err))
   }, [])
 
-   return (
+  return (
     <Layout>
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
         
@@ -30,10 +27,9 @@ export default function Clientes() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-extrabold text-juris-blue mb-1">Gestão de Clientes</h1>
-            <p className="text-slate-500 text-sm">Listagem sincronizada com o modelo `Cliente.js` do Sequelize.</p>
+            <p className="text-slate-500 text-sm">Consulte, cadastre e gerencie os clientes do escritório.</p>
           </div>
           
-          {/* 🌟 O botão só renderiza na tela se o usuário for Admin ou Advogado */}
           {podeCadastrarEAlterar && (
             <button 
               onClick={() => navigate('/clientes/novo')}
@@ -64,7 +60,7 @@ export default function Clientes() {
                     <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${
                       cliente.tipo_pessoa === 'fisica' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
                     }`}>
-                      {cliente.tipo_pessoa}
+                      {cliente.tipo_pessoa === 'fisica' ? 'Pessoa Física' : 'Pessoa Jurídica'}
                     </span>
                   </td>
                   <td className="p-4 text-slate-500 font-mono">
